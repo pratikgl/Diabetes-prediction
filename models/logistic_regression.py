@@ -11,7 +11,7 @@ from sklearn import metrics
 
 
 # Load data
-pdata = pd.read_csv("pimadata.csv")
+pdata = pd.read_csv("../dataset/pimadata.csv")
 
 
 # Data description
