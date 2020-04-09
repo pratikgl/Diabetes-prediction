@@ -12,9 +12,13 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
+# Created a boundary function to separate messing up of the printed outputs
+def boundary():
+    print("\n" + "--"*35 + "\n")
+
 
 # Load data
-pdata = pd.read_csv("../dataset/pimadata.csv")
+dataset = pd.read_csv("../dataset/pimadata.csv")
 
 
 # Data description
@@ -32,33 +36,65 @@ Outcome: Class variable (0 if non-diabetic, 1 if diabetic)
 
 
 # Check for data
-print("\nThe following dataset has been used:")
-print(pdata)
-
-
-# Check for null values
-print("\nNULL values in the dataset are:")
-print(pdata.isnull().sum())
-
-
-# Correlation between independent variables and outcomes
-print("\nThe correlation matrix is:")
-correlations = pdata.corr()
-print(correlations['Outcome'].sort_values(ascending=False))
+boundary()
+print("The following dataset has been used:\n")
+print(dataset)
+boundary()
+print("Information regarding all the columns :\n")
+print(dataset.info())
+boundary()
 
 
 # Diabetic population VS non diabtic population
-print("\nComparing non diabetic = 0 vs diabetic = 1")
-pdata.Outcome.value_counts()
-plt.title('Figure-1')
-sns.countplot(x = "Outcome", data = pdata)
+print("Comparing non diabetic = 0 vs diabetic = 1 :")
+print(dataset.groupby('Outcome').size())
+boundary()
+
+
+# Check for null values
+print("NULL values in the dataset are:")
+print(dataset.isnull().sum())
+boundary()
+
+
+# Check for 0 values
+print("Number of 0-entries in the dataset are:\n")
+for feature_names in dataset.columns[0:8]:
+    print('Number of 0-entries for "' + feature_names + '" feature: ' , end="")
+    count = (np.count_nonzero(dataset[feature_names] == 0))
+    print(count, end=" ")
+    print(' (' + '%.2f'%((count*100)/768) + '%)')
+boundary()
+
+
+
+# Checking the Correlations between variables
+print("The correlation of variables with Outcome is:")
+correlations = dataset.corr()
+print(correlations['Outcome'].sort_values(ascending=False))
+
+# Correlation Matrix
+print("\nCorrelation Marix has been printed")
+sns.heatmap(
+    data=dataset.corr(), 
+    annot=True, #printing values on cells
+    fmt='.2f', #rounding off
+    cmap='RdYlGn' #colors
+)
+
+plt.title("Correlation Matrix")
+fig = plt.gcf()
+fig.set_size_inches(10, 8)
 plt.show()
-print("Output = figure-1")
+
+boundary()
 
 
 # Dividing inedpendent and dependent (outcome) variables
-x = pdata[['Pregnancies', 'Glucose', 'BloodPressure',  'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age']]
-y = pdata['Outcome']
+feature_names = dataset.columns[0:8]
+x = dataset[feature_names]
+y = dataset['Outcome']
+
 
 
 # Splitting dataset into training set and test set

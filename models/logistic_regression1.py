@@ -1,9 +1,14 @@
+
+#copied file changes can be made here
+
+
 # Importing libraries
 import pandas as pd # data processing csv file I/O
 import numpy as np # high-performance multidimensional array object and tools for working with these arrays
 import matplotlib.pyplot as plt # plotting graphs
 import math # mathematical functions
 import seaborn as sns # statistical graphs
+
 from sklearn.model_selection import train_test_split # from scikit learn library Split arrays or matrices into random train and test subsets 
 from sklearn.linear_model import LogisticRegression # inbuilt functions for logistic regression
 from sklearn import metrics 
@@ -14,7 +19,7 @@ from sklearn.neighbors import KNeighborsClassifier
 
 
 # Load data
-pdata = pd.read_csv("../dataset/pimadata.csv")
+pdata = pd.read_csv("../dataset/germandiabetes.csv")
 
 
 # Data description
@@ -40,6 +45,12 @@ print(pdata)
 print("\nNULL values in the dataset are:")
 print(pdata.isnull().sum())
 
+for field in pdata.columns[:8]:
+    print('Number of 0-entries for "{field_name}" feature: {amount}'.format(
+        field_name=field,
+        amount=np.count_nonzero(pdata[field] == 0)
+    ))
+
 
 # Correlation between independent variables and outcomes
 print("\nThe correlation matrix is:")
@@ -48,12 +59,14 @@ print(correlations['Outcome'].sort_values(ascending=False))
 
 
 # Diabetic population VS non diabtic population
-print("\nComparing non diabetic = 0 vs diabetic = 1")
+print("\nComparing non diabetic = 0 vs diabetic = 1 : ")
+print("Output = figure-1")
+print(pdata.groupby('Outcome').size())
 pdata.Outcome.value_counts()
 plt.title('Figure-1')
 sns.countplot(x = "Outcome", data = pdata)
 plt.show()
-print("Output = figure-1")
+
 
 
 # Dividing inedpendent and dependent (outcome) variables
