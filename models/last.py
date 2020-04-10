@@ -1,3 +1,8 @@
+"""
+Description
+"""
+
+
 # Importing libraries
 import pandas as pd # data processing csv file I/O
 import numpy as np # high-performance multidimensional array object and tools for working with these arrays
@@ -12,7 +17,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
 
-# Created a boundary function to separate messing up of the printed outputs
+# Created a boundary function for clear visualization on console
 def boundary():
     print("\n" + "--"*35 + "\n")
 
@@ -67,22 +72,42 @@ for feature_names in dataset.columns[0:8]:
 boundary()
 
 
+# Removing 0 values
+print("Some features contain 0, it doesn't make sense here and this indicates missing value therefore we will remove all those columns which has 0-entries\n")
+print("Removing 0-entries from Glucose, BloodPressure, SkinThickness, Insulin, BMI\n")
+ds_0_remove = dataset[
+    (dataset.Glucose != 0)
+    & (dataset.BloodPressure != 0)
+    & (dataset.SkinThickness != 0)
+    & (dataset.Insulin != 0) 
+    & (dataset.BMI != 0)]
+
+print("After deleting 0-entries the final size of the data is:")
+print(ds_0_remove.shape)
+print("\nComparing non diabetic = 0 vs diabetic = 1 :")
+print(ds_0_remove.groupby('Outcome').size())
+boundary()
+
 
 # Checking the Correlations between variables
+#Before Removing Zero
+print("Before removing 0")
 print("The correlation of variables with Outcome is:")
 correlations = dataset.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
 
+
 # Correlation Matrix
+# Before removing zero
 print("\nCorrelation Marix has been printed")
 sns.heatmap(
-    data=dataset.corr(), 
+    data=dataset.corr(), #feeding data
     annot=True, #printing values on cells
     fmt='.2f', #rounding off
     cmap='RdYlGn' #colors
 )
 
-plt.title("Correlation Matrix")
+plt.title("Correlation Matrix before removing Zero")
 fig = plt.gcf()
 fig.set_size_inches(10, 8)
 plt.show()
@@ -90,11 +115,55 @@ plt.show()
 boundary()
 
 
+# Checking the Correlations between variables
+#After Removing Zero
+print("After removing 0")
+print("The correlation of variables with Outcome is:")
+correlations = ds_0_remove.corr()
+print(correlations['Outcome'].sort_values(ascending=False))
+
+
+# Correlation Matrix
+# After removing zero
+print("\nCorrelation Marix has been printed")
+sns.heatmap(
+    data=ds_0_remove.corr(), #feeding data
+    annot=True, #printing values on cells
+    fmt='.2f', #rounding off
+    cmap='RdYlGn' #colors
+)
+
+plt.title("Correlation Matrix after removing Zero")
+fig = plt.gcf()
+fig.set_size_inches(10, 8)
+plt.show()
+
+boundary()
+
+
+# Comparison of the Visualisation of the data
+plot = sns.pairplot(data=dataset, hue='Outcome')
+plot.fig.suptitle("Before removing zero", y=1.02)
+plt.show()
+print("Visualization before removing zero has been plotted")
+boundary()
+
+plot = sns.pairplot(data=ds_0_remove, hue='Outcome')
+plot.fig.suptitle("Before removing zero", y=1.02)
+plt.show()
+print("Visualization after removing zero has been plotted")
+boundary()
+
+
 # Dividing inedpendent and dependent (outcome) variables
 feature_names = dataset.columns[0:8]
-x = dataset[feature_names]
-y = dataset['Outcome']
-
+x = ds_0_remove[feature_names]
+y = ds_0_remove['Outcome']
+print("Dependent Variables are:")
+print(feature_names)
+print("\nIndependent variable is:")
+print("'Outcome'")
+boundary()
 
 
 # Splitting dataset into training set and test set
