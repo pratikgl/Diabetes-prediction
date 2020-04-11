@@ -63,7 +63,7 @@ nof=0
 score_list =[]
 for n in range(len(nof_list)):
     x_train, x_test, y_train, y_test = train_test_split(x,y, test_size = 0.25, random_state = 1)
-    model = LogisticRegression(random_state=40)
+    model = LogisticRegression(random_state=40, max_iter=1000)
     rfe = RFE(model,nof_list[n])
     x_train_rfe = rfe.fit_transform(x_train,y_train)
     x_test_rfe = rfe.transform(x_test)
