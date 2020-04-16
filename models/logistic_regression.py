@@ -20,15 +20,10 @@ import pandas as pd # data processing csv file I/O
 import numpy as np # high-performance multidimensional array object and tools for working with these arrays
 import matplotlib.pyplot as plt # plotting graphs
 import seaborn as sns # statistical graphs
-import operator
 from sklearn.model_selection import train_test_split # from scikit learn library Split arrays or matrices into random train and test subsets 
 from sklearn.linear_model import LogisticRegression # inbuilt functions for logistic regression
 from sklearn.feature_selection import RFE # for feature selection
 from sklearn import metrics 
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import RFECV
-from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 
 
 # Created a boundary function for clear visualization on console
@@ -37,7 +32,7 @@ def boundary():
 
 
 # Load data
-dataset = pd.read_csv("../dataset/pimadata.csv")
+dataset = pd.read_csv("../dataset/pimadata.csv")  #pimadata/germandata/combined_data
 
 
 # Data description
@@ -91,7 +86,7 @@ print("The correlation of variables with Outcome is:")
 correlations = dataset.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
 
-'''
+
 # Correlation Matrix
 print("\nCorrelation Marix has been printed")
 sns.heatmap(
@@ -111,7 +106,8 @@ plot.fig.suptitle("Before removing zero", y=1.02)
 plt.show()
 print("Visualization has been plotted")
 boundary()
-'''
+
+
 
 # Dividing inedpendent and dependent (outcome) variables
 feature_names = dataset.columns[0:8]
@@ -175,29 +171,62 @@ print(list(discarded_features_rfe))
 boundary()
 
 
-# Splitting dataset into training set and test set
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state = 1)
 
+# Final Model output without RFE
+print('The final report of the model when the result of RFE is excluded\n')
+
+# Independent and dependent variables
+x1 = dataset[feature_names]  #independent variables
+y1 = dataset['Outcome']      #dependent variable
+
+# Splitting dataset into training set and test set
+x_train1, x_test1, y_train1, y_test1 = train_test_split(x1, y1, test_size=0.25, random_state = 1)
 
 # Applying Logistic Regression
 model = LogisticRegression(random_state = 0, max_iter=1000)
-model.fit(x_train, y_train)
-
+model.fit(x_train1, y_train1)
 
 # Predicting Outcomes
-y_pred = model.predict(x_test)
-
+y_pred1 = model.predict(x_test)
 
 # Making confusion matrix
-cnf_matrix = metrics.confusion_matrix(y_test, y_pred)
+cnf_matrix1 = metrics.confusion_matrix(y_test1, y_pred1)
 print("\nThe confsuion matrix is:")
-print(cnf_matrix)
-
+print(cnf_matrix1)
 
 # Making report matrix
 print("\nThe report matrix is:")
-print(metrics.classification_report(y_test, y_pred))
+print(metrics.classification_report(y_test1, y_pred1))
+boundary()
 
+
+
+# Final Model output with RFE
+print('The final report of the model when the result of RFE is considered\n')
+
+# Independent and dependent variables
+x2 = dataset[selected_features_rfe]  #independent variables
+y2 = dataset['Outcome']      #dependent variable
+
+# Splitting dataset into training set and test set
+x_train2, x_test2, y_train2, y_test2 = train_test_split(x2, y2, test_size=0.25, random_state = 1)
+
+# Applying Logistic Regression
+model = LogisticRegression(random_state = 0, max_iter=1000)
+model.fit(x_train2, y_train2)
+
+# Predicting Outcomes
+y_pred2 = model.predict(x_test2)
+
+# Making confusion matrix
+cnf_matrix2 = metrics.confusion_matrix(y_test2, y_pred2)
+print("\nThe confsuion matrix is:")
+print(cnf_matrix2)
+
+# Making report matrix
+print("\nThe report matrix is:")
+print(metrics.classification_report(y_test2, y_pred2))
+boundary()
 
 # Refrences:
 """
