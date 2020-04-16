@@ -1,5 +1,16 @@
 """
-Description
+Authors:
+    Pratik Goyal (B18BB024)     Piyush Mathur (B18BB021)
+    goyal.9@iitj.ac.in          mathur.2@iitj.ac.in
+    
+Supervisor:
+    Dr. Pankaj Yadav
+    pyadav@iitj.ac.in
+Description:
+    
+
+Summary:
+    
 
 """
 
@@ -111,7 +122,6 @@ print(list(feature_names))
 print("\nIndependent variable is:")
 print("'Outcome'")
 boundary()
-
 
 
 
