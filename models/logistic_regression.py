@@ -1,5 +1,6 @@
 """
 Description
+
 """
 
 
@@ -93,8 +94,6 @@ fig = plt.gcf()
 fig.set_size_inches(10, 8)
 plt.show()
 boundary()
-
-
 # Visualising Data
 plot = sns.pairplot(data=dataset, hue='Outcome')
 plot.fig.suptitle("Before removing zero", y=1.02)
@@ -107,18 +106,19 @@ boundary()
 feature_names = dataset.columns[0:8]
 x = dataset[feature_names]
 y = dataset['Outcome']
-print("Dependent Variables are:")
-print(feature_names)
+print("\nDependent Variables are:")
+print(list(feature_names))
 print("\nIndependent variable is:")
 print("'Outcome'")
 boundary()
 
+'''
 diabetes_mod = dataset[(dataset.BloodPressure != 0) & (dataset.BMI != 0) & (dataset.Glucose != 0)]
 x_mod = diabetes_mod[feature_names]
 y_mod = diabetes_mod.Outcome
+'''
 
-
-
+'''
 # Selecting good features
 print("The goal of Recursive Feature Elimination (RFE) is to select features by feature ranking with recursive feature elimination.", end=" ")
 print("For more confidence of features selection we used K-Fold Cross Validation with Stratified k-fold.\n")
@@ -132,7 +132,7 @@ rfecv = RFECV(
     cv=strat_k_fold,
     scoring='accuracy'
 )
-rfecv.fit(x_mod, y_mod)
+rfecv.fit(x, y)
 plt.figure()
 plt.title('RFE with Logistic Regression')
 plt.xlabel('Number of features selected')
@@ -156,11 +156,62 @@ new_features = list(map(operator.itemgetter(0), new_features))
 print('\nThe most suitable features for prediction are :')
 print(new_features)
 boundary()
+'''
 
+
+
+# SELECTING GOOD FEATURES
+print("The goal of Recursive Feature Elimination (RFE) is to select features by feature ranking with recursive feature elimination.\n")
+high_score = 0    # Variable which will store the highest score value
+nof = 0           # Variable which will store the the total number of optimum features
+score_list = []   # list for storing the model scores
+# Splitting dataset into training set and test set
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state = 1)
+# used model
+model = LogisticRegression(solver='lbfgs', multi_class='auto',max_iter=1000)
+# applying RFE
+for feature_count in range(1, len(feature_names)+1):
+    rfe = RFE(model, feature_count)
+    x_train_rfe = rfe.fit_transform(x_train, y_train)
+    x_test_rfe = rfe.transform(x_test)
+    model.fit(x_train_rfe, y_train)
+    score = model.score(x_test_rfe, y_test) #individual score
+    score_list.append(score)  #appending individual score in score_list array
+    if(score > high_score): 
+        high_score = score   #updating the high score if score > high_score
+        nof = feature_count  #updating the value of no of features selected
+#plotting model score v/s number of features selected
+plt.figure()
+plt.title('RFE with Logistic Regression')
+plt.xlabel('Number of features selected')
+plt.ylabel('Model Score')
+plt.plot(range(1, len(feature_names)+1), score_list)        
+plt.show()
+print("RFE with Logistic Regression curve has been plotted\n")
+print('RFE was used to find the optimum number of features\n')
+print("Total optimum features that are selected: %d" %nof)
+print("Score with these %d features: %f" % (nof, high_score))
+boundary()
+
+# we now know the optimum number of features 
+# Applying RFE for those optimum features
+rfe = RFE(model, nof)          #initializing RFE
+x_rfe = rfe.fit_transform(x,y) #transforming data using RFE
+model.fit(x_rfe,y)             #fitting the data to the model
+table = pd.Series(rfe.support_, feature_names) #variable to store True/False table for corresponding features
+selected_features_rfe = table[table == True].index  #variable to store selected features
+discarded_features_rfe = table[table == False].index  #variable to store discarded features
+print('The True/False table for corresponding feature after RFE is :')
+print(table)
+print('\nThe selected features are :')
+print(list(selected_features_rfe))
+print('\nThe discarded features are :')
+print(list(discarded_features_rfe))
+boundary()
 
 
 # Splitting dataset into training set and test set
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state = 0)
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.25, random_state = 1)
 
 
 # Applying Logistic Regression
@@ -187,5 +238,4 @@ print(metrics.classification_report(y_test, y_pred))
 """
 Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011
 towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125
-
 """
