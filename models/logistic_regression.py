@@ -112,51 +112,6 @@ print("\nIndependent variable is:")
 print("'Outcome'")
 boundary()
 
-'''
-diabetes_mod = dataset[(dataset.BloodPressure != 0) & (dataset.BMI != 0) & (dataset.Glucose != 0)]
-x_mod = diabetes_mod[feature_names]
-y_mod = diabetes_mod.Outcome
-'''
-
-'''
-# Selecting good features
-print("The goal of Recursive Feature Elimination (RFE) is to select features by feature ranking with recursive feature elimination.", end=" ")
-print("For more confidence of features selection we used K-Fold Cross Validation with Stratified k-fold.\n")
-strat_k_fold = StratifiedKFold(
-    n_splits=10
-)
-logreg_model = LogisticRegression(max_iter=1000)
-rfecv = RFECV(
-    estimator=logreg_model,
-    step=1,
-    cv=strat_k_fold,
-    scoring='accuracy'
-)
-rfecv.fit(x, y)
-plt.figure()
-plt.title('RFE with Logistic Regression')
-plt.xlabel('Number of features selected')
-plt.ylabel('Accuracy')
-plt.plot(range(1, len(rfecv.grid_scores_) + 1), rfecv.grid_scores_)
-plt.show()
-print("RFE with Logistic Regression curve has been plotted\n")
-# grid_scores_ returns a list of accuracy scores for each of the features selected
-print("grid_scores_ returns a list of accuracy scores for each of the features selected\n")
-print("The rfecv grid_scores_ :")
-print(rfecv.grid_scores_)
-# support_ is another attribute to find out the features which contribute the most to predicting
-print("\nThe rfecv.support_ : ")
-print(rfecv.support_)
-# Good Features
-new_features = list(filter(
-    lambda x: x[1],
-    zip(feature_names, rfecv.support_)
-))
-new_features = list(map(operator.itemgetter(0), new_features))
-print('\nThe most suitable features for prediction are :')
-print(new_features)
-boundary()
-'''
 
 
 
