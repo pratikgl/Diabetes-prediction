@@ -6,13 +6,23 @@ Authors:
 Supervisor:
     Dr. Pankaj Yadav
     pyadav@iitj.ac.in
+    
 Description:
-    
+    Statistical model to predict the risk of diabetes in which Logistic Regression
+    model is used and no data has been removed from the dataset even if they contained
+    'NULL' or '0' values.
 
-Summary:
-    
-
+Steps:
+    Loading Data
+    Checking the Data integrity
+    Checking for Correlations
+    Data Visualization
+    Feature Selection
+    Feeding data into LR model
+    Result: without feature selection
+    Result: with feature selection
 """
+
 
 
 # Importing libraries
@@ -26,13 +36,16 @@ from sklearn.feature_selection import RFE # for feature selection
 from sklearn import metrics 
 
 
+
 # Created a boundary function for clear visualization on console
 def boundary():
     print("\n" + "--"*35 + "\n")
 
 
+
 # Load data
 dataset = pd.read_csv("../dataset/pimadata.csv")  #pimadata/germandata/combined_data
+
 
 
 # Data description
@@ -49,6 +62,7 @@ Outcome: Class variable (0 if non-diabetic, 1 if diabetic)
 """
 
 
+
 # Check for data
 boundary()
 print("The following dataset has been used:\n")
@@ -59,10 +73,12 @@ print(dataset.info())
 boundary()
 
 
+
 # Diabetic population VS non diabtic population
 print("Comparing non diabetic = 0 vs diabetic = 1 :")
 print(dataset.groupby('Outcome').size())
 boundary()
+
 
 
 # Check for null values
@@ -71,20 +87,23 @@ print(dataset.isnull().sum())
 boundary()
 
 
+
 # Check for 0 values
 print("Number of 0-entries in the dataset are:\n")
 for feature_names in dataset.columns[0:8]:
     print('Number of 0-entries for "' + feature_names + '" feature: ' , end="")
     count = (np.count_nonzero(dataset[feature_names] == 0))
     print(count, end=" ")
-    print(' (' + '%.2f'%((count*100)/768) + '%)')
+    print(' (' + '%.2f'%((count*100)/len(dataset)) + '%)')
 boundary()
+
 
 
 # Checking the Correlations between variables
 print("The correlation of variables with Outcome is:")
 correlations = dataset.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
+
 
 
 # Correlation Matrix
@@ -100,6 +119,9 @@ fig = plt.gcf()
 fig.set_size_inches(10, 8)
 plt.show()
 boundary()
+
+
+
 # Visualising Data
 plot = sns.pairplot(data=dataset, hue='Outcome')
 plot.fig.suptitle("Before removing zero", y=1.02)
@@ -157,8 +179,8 @@ boundary()
 # we now know the optimum number of features 
 # Applying RFE for those optimum features
 rfe = RFE(model, nof)          #initializing RFE
-x_rfe = rfe.fit_transform(x,y) #transforming data using RFE
-model.fit(x_rfe,y)             #fitting the data to the model
+x_rfe = rfe.fit_transform(x, y) #transforming data using RFE
+model.fit(x_rfe, y)             #fitting the data to the model
 table = pd.Series(rfe.support_, feature_names) #variable to store True/False table for corresponding features
 selected_features_rfe = table[table == True].index  #variable to store selected features
 discarded_features_rfe = table[table == False].index  #variable to store discarded features
@@ -228,8 +250,3 @@ print("\nThe report matrix is:")
 print(metrics.classification_report(y_test2, y_pred2))
 boundary()
 
-# Refrences:
-"""
-Scikit-learn: Machine Learning in Python, Pedregosa et al., JMLR 12, pp. 2825-2830, 2011
-towardsdatascience.com/real-world-implementation-of-logistic-regression-5136cefb8125
-"""
