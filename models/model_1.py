@@ -144,7 +144,7 @@ boundary()
 
 
 # SELECTING GOOD FEATURES
-print("The goal of Recursive Feature Elimination (RFE) is to select features by feature ranking with recursive feature elimination.\n")
+print("The goal of Recursive Feature Elimination (RFE) is to select features by feature ranking.\n")
 high_score = 0    # Variable which will store the highest score value
 nof = 0           # Variable which will store the the total number of optimum features
 score_list = []   # list for storing the model scores
