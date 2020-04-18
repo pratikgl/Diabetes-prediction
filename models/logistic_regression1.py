@@ -15,6 +15,7 @@ Steps:
     Loading Data
     Checking the Data integrity
     Removal of cols with 0-entries
+    Data Imputation
     Checking for Correlations (and comparison)
     Data Visualization (and comparison)
     Feature Selection 
@@ -99,6 +100,7 @@ boundary()
 
 
 
+# Data Imputation 
 # Removing 0 entries
 ds_0_remove = dataset[
     (dataset.Glucose != 0)
