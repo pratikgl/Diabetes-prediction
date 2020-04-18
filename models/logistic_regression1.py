@@ -151,16 +151,40 @@ def replace(feature, ds):
     boundary()
     return 0
 
-replace('Glucose', replace_0) # Conversion for 'Glucose'
+replace('Glucose', replace_0)       # Conversion for 'Glucose'
 replace('BloodPressure', replace_0) # Conversion for 'BloodPressure'
 replace('SkinThickness', replace_0) # Conversion for 'SkinThickness'
-replace('Insulin', replace_0) # Conversion for 'Insulin'
-replace('BMI', replace_0) # Conversion for 'BMI'
+replace('Insulin', replace_0)       # Conversion for 'Insulin'
+replace('BMI', replace_0)           # Conversion for 'BMI'
 
 
 
+# Checking the Correlations between variables
+#Before Removing Zero
+print("Before removing 0\n")
+print("The correlation of variables with Outcome is:")
+correlations = dataset.corr()
+print(correlations['Outcome'].sort_values(ascending=False))
 
-'''
+
+
+# Correlation Matrix
+# Before removing zero
+sns.heatmap(
+    data=dataset.corr(), #feeding data
+    annot=True, #printing values on cells
+    fmt='.2f', #rounding off
+    cmap='RdYlGn' #colors
+)
+plt.title("Correlation Matrix before removing Zero")
+fig = plt.gcf()
+fig.set_size_inches(10, 8)
+plt.show()
+print("\nCorrelation Marix has been plotted")
+boundary()
+
+
+
 # Checking the Correlations between variables
 # After Removing Zero
 print("After removing 0\n")
@@ -174,9 +198,9 @@ print(correlations['Outcome'].sort_values(ascending=False))
 # After removing zero
 sns.heatmap(
     data=ds_0_remove.corr(), #feeding data
-    annot=True, #printing values on cells
-    fmt='.2f', #rounding off
-    cmap='RdYlGn' #colors
+    annot=True,              #printing values on cells
+    fmt='.2f',               #rounding off
+    cmap='RdYlGn'            #colors
 )
 plt.title("Correlation Matrix after removing Zero")
 fig = plt.gcf()
@@ -187,25 +211,51 @@ boundary()
 
 
 
-# Comparison of the Visualisation of the data
-plot = sns.pairplot(data=dataset, hue='Outcome')
-plot.fig.suptitle("Before removing zero", y=1.02)
+# Checking the Correlations between variables
+# After replacing 0-entries
+print("After data imputation\n")
+print("The correlation of variables with Outcome is:")
+correlations = replace_0.corr()
+print(correlations['Outcome'].sort_values(ascending=False))
+
+
+
+# Correlation Matrix
+# After replacing 0-entries
+sns.heatmap(
+    data=replace_0.corr(), #feeding data
+    annot=True,            #printing values on cells
+    fmt='.2f',             #rounding off
+    cmap='RdYlGn'          #colors
+)
+plt.title("Correlation Matrix after data imputation")
+fig = plt.gcf()
+fig.set_size_inches(10, 8)
 plt.show()
-print("Visualization before removing 0 has been plotted")
+print("\nCorrelation Marix has been plotted")
 boundary()
 
+
+'''
+# Comparison of the Visualisation of the data
 plot = sns.pairplot(data=ds_0_remove, hue='Outcome')
-plot.fig.suptitle("Before removing zero", y=1.02)
+plot.fig.suptitle("After removing zero", y=1.02)
 plt.show()
 print("Visualization after removing 0 has been plotted")
 boundary()
 
+plot = sns.pairplot(data=replace_0, hue='Outcome')
+plot.fig.suptitle("After Data Imputation", y=1.02)
+plt.show()
+print("Visualization after data imputation has been plotted")
+boundary()
+'''
 
 
 # Dividing independent and dependent (outcome) variables
-feature_names = ds_0_remove.columns[0:8]
-x = ds_0_remove[feature_names]
-y = ds_0_remove['Outcome']
+feature_names = replace_0.columns[0:8]
+x = replace_0[feature_names]
+y = replace_0['Outcome']
 print("Dependent Variables are:")
 print(list(feature_names))
 print("\nIndependent variable is:")
@@ -266,11 +316,11 @@ boundary()
 
 
 # Final Model output without RFE
-print('The final report of the model when the result of RFE is excluded and the cols with 0-entries are removed\n')
+print('The final report of the model with data immputation and when the result of RFE is excluded.\n')
 
 # Independent and dependent variables
-x1 = ds_0_remove[feature_names]  #independent variables
-y1 = ds_0_remove['Outcome']      #dependent variable
+x1 = replace_0[feature_names]  #independent variables
+y1 = replace_0['Outcome']      #dependent variable
 
 # Splitting dataset into training set and test set
 x_train1, x_test1, y_train1, y_test1 = train_test_split(x1, y1, test_size=0.25, random_state = 1)
@@ -295,11 +345,11 @@ boundary()
 
 
 # Final Model output with RFE
-print('The final report of the model when the result of RFE is considered and the cols with 0-entries are removed\n')
+print('The final report of the model with data immputation and when the result of RFE is considered.\n')
 
 # Independent and dependent variables
-x2 = ds_0_remove[selected_features_rfe]  #independent variables
-y2 = ds_0_remove['Outcome']              #dependent variable
+x2 = replace_0[selected_features_rfe]  #independent variables
+y2 = replace_0['Outcome']              #dependent variable
 
 # Splitting dataset into training set and test set
 x_train2, x_test2, y_train2, y_test2 = train_test_split(x2, y2, test_size=0.25, random_state = 1)
@@ -320,5 +370,3 @@ print(cnf_matrix2)
 print("\nThe report matrix is:")
 print(metrics.classification_report(y_test2, y_pred2))
 boundary()
-
-'''
