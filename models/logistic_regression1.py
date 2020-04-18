@@ -9,7 +9,7 @@ Supervisor:
     
 Description:
     Statistical model to predict the risk of diabetes in which Logistic Regression
-    model is used and all the columns with 0-inputs are removed
+    model is used and data imputation is applied for 0-entries
 
 Steps:
     Loading Data
@@ -17,7 +17,6 @@ Steps:
     Removal of cols with 0-entries
     Data Imputation
     Checking for Correlations (and comparison)
-    Data Visualization (and comparison)
     Feature Selection 
     Feeding data into LR model
     Result: without feature selection
@@ -100,7 +99,6 @@ boundary()
 
 
 
-# Data Imputation 
 # Removing 0 entries
 ds_0_remove = dataset[
     (dataset.Glucose != 0)
@@ -111,6 +109,7 @@ ds_0_remove = dataset[
 
 
 
+# DATA IMPUTATION
 # Replacing 0 entries
 replace_0 = dataset.copy()     #variable for storing replaced values
 replace_0[[                    #converting 0-entries to NaN
@@ -237,21 +236,6 @@ plt.show()
 print("\nCorrelation Marix has been plotted")
 boundary()
 
-
-'''
-# Comparison of the Visualisation of the data
-plot = sns.pairplot(data=ds_0_remove, hue='Outcome')
-plot.fig.suptitle("After removing zero", y=1.02)
-plt.show()
-print("Visualization after removing 0 has been plotted")
-boundary()
-
-plot = sns.pairplot(data=replace_0, hue='Outcome')
-plot.fig.suptitle("After Data Imputation", y=1.02)
-plt.show()
-print("Visualization after data imputation has been plotted")
-boundary()
-'''
 
 
 # Dividing independent and dependent (outcome) variables
