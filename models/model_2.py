@@ -219,7 +219,7 @@ for feature_count in range(1, len(feature_names)+1):
         high_score = score   #updating the high score if score > high_score
         nof = feature_count  #updating the value of no of features selected
 #plotting model score v/s number of features selected
-plt.figure()
+plt.figure(dpi = 600)
 plt.title('RFE with Logistic Regression')
 plt.xlabel('Number of features selected')
 plt.ylabel('Model Score')
