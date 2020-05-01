@@ -241,6 +241,7 @@ fpr4, tpr4, thresholds4 = roc_curve(y4_test, lgreg_prob4)
 
 # plot the roc curve for the model
 plt.figure(dpi = 600)
+plt.title('AUC curves')
 plt.plot(fpr0, tpr0, linestyle = '--', label = 'No Skill')
 plt.plot(fpr1, tpr1, marker = '.', label = 'with 0-entries')
 plt.plot(fpr2, tpr2, marker = '.', label = 'Without 0-entries')
