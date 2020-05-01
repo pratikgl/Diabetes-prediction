@@ -9,7 +9,7 @@ Supervisor:
     
 Description:
     Statistical model to predict the risk of diabetes in which Logistic Regression
-    model is used and data imputation is implemented using median by target method
+    model is used and data imputation is implemented using KNN based imputation method
     
 Steps:
     Loading Data
@@ -33,7 +33,8 @@ import seaborn as sns # statistical graphs
 from sklearn.model_selection import train_test_split # from scikit learn library Split arrays or matrices into random train and test subsets 
 from sklearn.linear_model import LogisticRegression # inbuilt functions for logistic regression
 from sklearn.feature_selection import RFE # for feature selection
-from sklearn import metrics 
+from sklearn.impute import KNNImputer     # for KNN imputation
+from sklearn import metrics # for report metrics
 
 
 
@@ -109,8 +110,8 @@ ds_0_remove = dataset[
 
 
 
-# DATA IMPUTATION USING MEDIAN BY TARGET METHOD
-# Replacing 0 entries
+# DATA IMPUTATION USING MEDIAN BY TARGET
+# Replacing 0 entries to NaN
 replace_0_median = dataset.copy()     #variable for storing replaced values
 replace_0_median[[                    #converting 0-entries to NaN
     'Glucose',
@@ -129,13 +130,9 @@ replace_0_median[[                    #converting 0-entries to NaN
 def median_target(var):   
     temp = replace_0_median[replace_0_median[var].notnull()]
     temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].median().reset_index()
-    print('\nMedian by target for ' + var + ':')
-    print(temp)
     return temp
 # Final replacement with median values 
 def replace(feature, ds):
-    print('\t' + feature +'\n')
-    print('Total NULL values before replacement:  ' + str(ds[feature].isnull().sum()))
     temp = median_target(feature)
     ds.loc[
         (ds['Outcome'] == 0 ) 
@@ -147,9 +144,6 @@ def replace(feature, ds):
         & (ds[feature].isnull()), 
         feature
         ] = temp[feature][1]
-    print('\nThe NULL values has been replaced\n')
-    print('Total NULL values after replacement:  ' + str(ds[feature].isnull().sum()))
-    boundary()
     return 0
 
 replace('Glucose', replace_0_median)       # Conversion for 'Glucose'
@@ -157,6 +151,45 @@ replace('BloodPressure', replace_0_median) # Conversion for 'BloodPressure'
 replace('SkinThickness', replace_0_median) # Conversion for 'SkinThickness'
 replace('Insulin', replace_0_median)       # Conversion for 'Insulin'
 replace('BMI', replace_0_median)           # Conversion for 'BMI'
+
+
+
+
+# DATA IMPUTATION USING KNN IMPUTATION METHOD
+# Replacing 0 entries to NaN
+replace_0_KNN = dataset.copy()     #variable for storing replaced values
+replace_0_KNN[[                    #converting 0-entries to NaN
+    'Glucose',
+    'BloodPressure',
+    'SkinThickness',
+    'Insulin',
+    'BMI'
+    ]] = replace_0_KNN[[
+        'Glucose',
+        'BloodPressure',
+        'SkinThickness',
+        'Insulin',
+        'BMI'
+        ]].replace(0,np.NaN)
+# applying KNN imputer
+imputer = KNNImputer(n_neighbors = 5)
+# result in 2-d array
+replace_0_KNN = imputer.fit_transform(replace_0_KNN)
+# conversion o array into 2-d panda array
+replace_0_KNN = pd.DataFrame(
+    replace_0_KNN, 
+    index=np.arange(0, len(replace_0_KNN)), 
+    columns = [
+        'Pregnancies', 
+        'Glucose', 
+        'BloodPressure', 
+        'SkinThickness', 
+        'Insulin', 
+        'BMI', 
+        'DiabetesPedigreeFunction', 
+        'Age',
+        'Outcome'])
+
 
 
 
@@ -209,14 +242,14 @@ boundary()
 
 
 # Checking the Correlations between variables
-# After replacing 0-entries using median by target methods
-print("After data imputation using median by target method\n")
+# After replacing 0-entries using median by target method
+print("After data imputation using median by target\n")
 print("The correlation of variables with Outcome is:")
 correlations = replace_0_median.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
 
 # Correlation Matrix
-# After replacing 0-entries using median by target methods
+# After replacing 0-entries using median by target method
 sns.heatmap(
     data=replace_0_median.corr(), #feeding data
     annot=True,            #printing values on cells
@@ -231,14 +264,39 @@ print("\nCorrelation Marix has been plotted")
 boundary()
 
 
-# MODEL RESULT: DATASET AFTER IMPUTATION USING MEDIAN BY TARGET
-print('\nRESULT when the dataset is imputed using median by target method \n')
+
+# Checking the Correlations between variables
+# After replacing 0-entries using KNN imputation method
+print("After data imputation using KNN imputation\n")
+print("The correlation of variables with Outcome is:")
+correlations = replace_0_KNN.corr()
+print(correlations['Outcome'].sort_values(ascending=False))
+
+# Correlation Matrix
+# After replacing 0-entries using KNN imputation method
+sns.heatmap(
+    data=replace_0_KNN.corr(), #feeding data
+    annot=True,                #printing values on cells
+    fmt='.2f',                 #rounding off
+    cmap='RdYlGn'              #colors
+)
+plt.title("Correlation Matrix after KNN imputation")
+fig = plt.gcf()
+fig.set_size_inches(10, 8)
+plt.show()
+print("\nCorrelation Marix has been plotted")
+boundary()
+
+
+
+# MODEL RESULT: DATASET AFTER IMPUTATION USING KNN
+print('\nRESULT when the dataset is imputed using KNN imputation \n')
 boundary()
 
 # Dividing independent and dependent (outcome) variables
-feature_names = replace_0_median.columns[0:8]
-x = replace_0_median[feature_names]
-y = replace_0_median['Outcome']
+feature_names = replace_0_KNN.columns[0:8]
+x = replace_0_KNN[feature_names]
+y = replace_0_KNN['Outcome']
 print("Dependent Variables are:")
 print(list(feature_names))
 print("\nIndependent variable is:")
@@ -299,11 +357,11 @@ boundary()
 
 
 # Final Model output without RFE
-print('The final report of the model with data imputation using median by target and when the result of RFE is excluded.\n')
+print('The final report of the model with data imputation using KNN and when the result of RFE is excluded.\n')
 
 # Independent and dependent variables
-x1 = replace_0_median[feature_names]  #independent variables
-y1 = replace_0_median['Outcome']      #dependent variable
+x1 = replace_0_KNN[feature_names]  #independent variables
+y1 = replace_0_KNN['Outcome']      #dependent variable
 
 # Splitting dataset into training set and test set
 x_train1, x_test1, y_train1, y_test1 = train_test_split(x1, y1, test_size=0.25, random_state = 1)
@@ -328,11 +386,11 @@ boundary()
 
 
 # Final Model output with RFE
-print('The final report of the model with data imputation using median by target and when the result of RFE is considered.\n')
+print('The final report of the model with data imputation using KNN and when the result of RFE is considered.\n')
 
 # Independent and dependent variables
-x2 = replace_0_median[selected_features_rfe]  #independent variables
-y2 = replace_0_median['Outcome']              #dependent variable
+x2 = replace_0_KNN[selected_features_rfe]  #independent variables
+y2 = replace_0_KNN['Outcome']              #dependent variable
 
 # Splitting dataset into training set and test set
 x_train2, x_test2, y_train2, y_test2 = train_test_split(x2, y2, test_size=0.25, random_state = 1)
