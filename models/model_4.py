@@ -37,6 +37,15 @@ from sklearn.impute import KNNImputer     # for KNN imputation
 from sklearn import metrics # for report metrics
 
 
+'''
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
+'''
+
 
 # Created a boundary function for clear visualization on console
 def boundary():
