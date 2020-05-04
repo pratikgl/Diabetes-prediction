@@ -43,30 +43,30 @@ ds_0_remove = dataset[
 
 
 
-# DATA IMPUTATION USING MEDIAN BY TARGET
+# DATA IMPUTATION USING MEAN BY TARGET
 # Replacing 0 entries to NaN
-replace_0_median = dataset.copy()     #variable for storing replaced values
-replace_0_median[[                    #converting 0-entries to NaN
+replace_0_mean = dataset.copy()     #variable for storing replaced values
+replace_0_mean[[                    #converting 0-entries to NaN
     'Glucose',
     'BloodPressure',
     'SkinThickness',
     'Insulin',
     'BMI'
-    ]] = replace_0_median[[
+    ]] = replace_0_mean[[
         'Glucose',
         'BloodPressure',
         'SkinThickness',
         'Insulin',
         'BMI'
         ]].replace(0,np.NaN)
-# For replacing missing values we are using median by target (Outcome)
-def median_target(var):   
-    temp = replace_0_median[replace_0_median[var].notnull()]
-    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].median().reset_index()
+# For replacing missing values we are using mean by target (Outcome)
+def mean_target(var):   
+    temp = replace_0_mean[replace_0_mean[var].notnull()]
+    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].mean().reset_index()
     return temp
-# Final replacement with median values 
+# Final replacement with mean values 
 def replace(feature, ds):
-    temp = median_target(feature)
+    temp = mean_target(feature)
     ds.loc[
         (ds['Outcome'] == 0 ) 
         & (ds[feature].isnull()), 
@@ -79,11 +79,11 @@ def replace(feature, ds):
         ] = temp[feature][1]
     return 0
 
-replace('Glucose', replace_0_median)       # Conversion for 'Glucose'
-replace('BloodPressure', replace_0_median) # Conversion for 'BloodPressure'
-replace('SkinThickness', replace_0_median) # Conversion for 'SkinThickness'
-replace('Insulin', replace_0_median)       # Conversion for 'Insulin'
-replace('BMI', replace_0_median)           # Conversion for 'BMI'
+replace('Glucose', replace_0_mean)       # Conversion for 'Glucose'
+replace('BloodPressure', replace_0_mean) # Conversion for 'BloodPressure'
+replace('SkinThickness', replace_0_mean) # Conversion for 'SkinThickness'
+replace('Insulin', replace_0_mean)       # Conversion for 'Insulin'
+replace('BMI', replace_0_mean)           # Conversion for 'BMI'
 
 
 
@@ -168,11 +168,11 @@ y2 = ds_0_remove['Outcome']
 final_features = apply_rfe(x2, y2)
 x2 = ds_0_remove[final_features]
 
-# After imputing 0-entries using median by outcome
-x3 = replace_0_median[feature_names]
-y3 = replace_0_median['Outcome']
+# After imputing 0-entries using mean by outcome
+x3 = replace_0_mean[feature_names]
+y3 = replace_0_mean['Outcome']
 final_features = apply_rfe(x3, y3)
-x3 = replace_0_median[final_features]
+x3 = replace_0_mean[final_features]
 
 # After imputing 0-entries using KNN imputation
 x4 = replace_0_KNN[feature_names]
@@ -206,7 +206,7 @@ lgreg_prob2 = lgreg_prob2[:, 1]   # keep probabilities for the positive outcome 
 lgreg_auc2  = roc_auc_score(y2_test, lgreg_prob2)  # calculating ROC AUC score
 
 
-# After imputing 0-entries using median by outcome
+# After imputing 0-entries using mean by outcome
 model.fit(x3_train, y3_train)
 lgreg_prob3 = model.predict_proba(x3_test)         # predict probabilities
 lgreg_prob3 = lgreg_prob3[:, 1]   # keep probabilities for the positive outcome only
@@ -226,7 +226,7 @@ no_skill_auc = roc_auc_score(y1_test, [0]*len(y1_test)) # calculating ROC AUC sc
 print('\nWith no skills \nROC AUC = %.3f' % (no_skill_auc))
 print('\nBefore removing 0-entries \nROC AUC = %.3f' % (lgreg_auc1))
 print('\nAfter removing 0-entries  \nROC AUC = %.3f' % (lgreg_auc2))
-print('\nAfter imputing 0-entries using median by target \nROC AUC = %.3f' % (lgreg_auc3))
+print('\nAfter imputing 0-entries using Mean by target \nROC AUC = %.3f' % (lgreg_auc3))
 print('\nAfter imputing 0-entries using KNN imputation \nROC AUC = %.3f' % (lgreg_auc4))
 
 
@@ -245,7 +245,7 @@ plt.title('AUC curves')
 plt.plot(fpr0, tpr0, linestyle = '--', label = 'No Skill')
 plt.plot(fpr1, tpr1, marker = '.', label = 'With 0-entries')
 plt.plot(fpr2, tpr2, marker = '.', label = 'Without 0-entries')
-plt.plot(fpr3, tpr3, marker = '.', label = 'Median Imputation')
+plt.plot(fpr3, tpr3, marker = '.', label = 'Mean Imputation')
 plt.plot(fpr4, tpr4, marker = '.', label = 'KNN Imputation')
 
 # axis labels

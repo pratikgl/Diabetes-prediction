@@ -110,30 +110,30 @@ ds_0_remove = dataset[
 
 
 
-# DATA IMPUTATION USING MEDIAN BY TARGET
+# DATA IMPUTATION USING MEAN BY TARGET
 # Replacing 0 entries to NaN
-replace_0_median = dataset.copy()     #variable for storing replaced values
-replace_0_median[[                    #converting 0-entries to NaN
+replace_0_mean = dataset.copy()     #variable for storing replaced values
+replace_0_mean[[                    #converting 0-entries to NaN
     'Glucose',
     'BloodPressure',
     'SkinThickness',
     'Insulin',
     'BMI'
-    ]] = replace_0_median[[
+    ]] = replace_0_mean[[
         'Glucose',
         'BloodPressure',
         'SkinThickness',
         'Insulin',
         'BMI'
         ]].replace(0,np.NaN)
-# For replacing missing values we are using median by target (Outcome)
-def median_target(var):   
-    temp = replace_0_median[replace_0_median[var].notnull()]
-    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].median().reset_index()
+# For replacing missing values we are using mean by target (Outcome)
+def mean_target(var):   
+    temp = replace_0_mean[replace_0_mean[var].notnull()]
+    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].mean().reset_index()
     return temp
-# Final replacement with median values 
+# Final replacement with mean values 
 def replace(feature, ds):
-    temp = median_target(feature)
+    temp = mean_target(feature)
     ds.loc[
         (ds['Outcome'] == 0 ) 
         & (ds[feature].isnull()), 
@@ -146,11 +146,11 @@ def replace(feature, ds):
         ] = temp[feature][1]
     return 0
 
-replace('Glucose', replace_0_median)       # Conversion for 'Glucose'
-replace('BloodPressure', replace_0_median) # Conversion for 'BloodPressure'
-replace('SkinThickness', replace_0_median) # Conversion for 'SkinThickness'
-replace('Insulin', replace_0_median)       # Conversion for 'Insulin'
-replace('BMI', replace_0_median)           # Conversion for 'BMI'
+replace('Glucose', replace_0_mean)       # Conversion for 'Glucose'
+replace('BloodPressure', replace_0_mean) # Conversion for 'BloodPressure'
+replace('SkinThickness', replace_0_mean) # Conversion for 'SkinThickness'
+replace('Insulin', replace_0_mean)       # Conversion for 'Insulin'
+replace('BMI', replace_0_mean)           # Conversion for 'BMI'
 
 
 
@@ -242,21 +242,21 @@ boundary()
 
 
 # Checking the Correlations between variables
-# After replacing 0-entries using median by target method
-print("After data imputation using median by target\n")
+# After replacing 0-entries using mean by target method
+print("After data imputation using Mean by target\n")
 print("The correlation of variables with Outcome is:")
-correlations = replace_0_median.corr()
+correlations = replace_0_mean.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
 
 # Correlation Matrix
-# After replacing 0-entries using median by target method
+# After replacing 0-entries using mean by target method
 sns.heatmap(
-    data=replace_0_median.corr(), #feeding data
+    data=replace_0_mean.corr(), #feeding data
     annot=True,            #printing values on cells
     fmt='.2f',             #rounding off
     cmap='RdYlGn'          #colors
 )
-plt.title("Correlation Matrix after median by target data imputation")
+plt.title("Correlation Matrix after mean by target data imputation")
 fig = plt.gcf()
 fig.set_size_inches(10, 8)
 plt.show()

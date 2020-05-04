@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['models\\model_1.py', 'models\\model_2.py', 'models\\model_3.py']
+recent_files = ['models\\model_1.py', 'models\\model_2.py', 'models\\model_3.py', 'models\\model_4.py', 'models\\ROC_curve.py']
 

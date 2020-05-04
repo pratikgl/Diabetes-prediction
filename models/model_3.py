@@ -9,7 +9,7 @@ Supervisor:
     
 Description:
     Statistical model to predict the risk of diabetes in which Logistic Regression
-    model is used and data imputation is implemented using median by target method
+    model is used and data imputation is implemented using mean by target method
     
 Steps:
     Loading Data
@@ -109,34 +109,34 @@ ds_0_remove = dataset[
 
 
 
-# DATA IMPUTATION USING MEDIAN BY TARGET METHOD
+# DATA IMPUTATION USING MEAN BY TARGET METHOD
 # Replacing 0 entries
-replace_0_median = dataset.copy()     #variable for storing replaced values
-replace_0_median[[                    #converting 0-entries to NaN
+replace_0_mean = dataset.copy()     #variable for storing replaced values
+replace_0_mean[[                    #converting 0-entries to NaN
     'Glucose',
     'BloodPressure',
     'SkinThickness',
     'Insulin',
     'BMI'
-    ]] = replace_0_median[[
+    ]] = replace_0_mean[[
         'Glucose',
         'BloodPressure',
         'SkinThickness',
         'Insulin',
         'BMI'
         ]].replace(0,np.NaN)
-# For replacing missing values we are using median by target (Outcome)
-def median_target(var):   
-    temp = replace_0_median[replace_0_median[var].notnull()]
-    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].median().reset_index()
-    print('\nMedian by target for ' + var + ':')
+# For replacing missing values we are using mean by target (Outcome)
+def mean_target(var):   
+    temp = replace_0_mean[replace_0_mean[var].notnull()]
+    temp = temp[[var, 'Outcome']].groupby(['Outcome'])[[var]].mean().reset_index()
+    print('\nMean by target for ' + var + ':')
     print(temp)
     return temp
-# Final replacement with median values 
+# Final replacement with mean values 
 def replace(feature, ds):
     print('\t' + feature +'\n')
     print('Total NULL values before replacement:  ' + str(ds[feature].isnull().sum()))
-    temp = median_target(feature)
+    temp = mean_target(feature)
     ds.loc[
         (ds['Outcome'] == 0 ) 
         & (ds[feature].isnull()), 
@@ -152,11 +152,11 @@ def replace(feature, ds):
     boundary()
     return 0
 
-replace('Glucose', replace_0_median)       # Conversion for 'Glucose'
-replace('BloodPressure', replace_0_median) # Conversion for 'BloodPressure'
-replace('SkinThickness', replace_0_median) # Conversion for 'SkinThickness'
-replace('Insulin', replace_0_median)       # Conversion for 'Insulin'
-replace('BMI', replace_0_median)           # Conversion for 'BMI'
+replace('Glucose', replace_0_mean)       # Conversion for 'Glucose'
+replace('BloodPressure', replace_0_mean) # Conversion for 'BloodPressure'
+replace('SkinThickness', replace_0_mean) # Conversion for 'SkinThickness'
+replace('Insulin', replace_0_mean)       # Conversion for 'Insulin'
+replace('BMI', replace_0_mean)           # Conversion for 'BMI'
 
 
 
@@ -209,21 +209,21 @@ boundary()
 
 
 # Checking the Correlations between variables
-# After replacing 0-entries using median by target methods
-print("After data imputation using median by target method\n")
+# After replacing 0-entries using mean by target methods
+print("After data imputation using mean by target method\n")
 print("The correlation of variables with Outcome is:")
-correlations = replace_0_median.corr()
+correlations = replace_0_mean.corr()
 print(correlations['Outcome'].sort_values(ascending=False))
 
 # Correlation Matrix
-# After replacing 0-entries using median by target methods
+# After replacing 0-entries using mean by target methods
 sns.heatmap(
-    data=replace_0_median.corr(), #feeding data
+    data=replace_0_mean.corr(), #feeding data
     annot=True,            #printing values on cells
     fmt='.2f',             #rounding off
     cmap='RdYlGn'          #colors
 )
-plt.title("Correlation Matrix after median by target data imputation")
+plt.title("Correlation Matrix after mean by target data imputation")
 fig = plt.gcf()
 fig.set_size_inches(10, 8)
 plt.show()
@@ -231,14 +231,14 @@ print("\nCorrelation Marix has been plotted")
 boundary()
 
 
-# MODEL RESULT: DATASET AFTER IMPUTATION USING MEDIAN BY TARGET
-print('\nRESULT when the dataset is imputed using median by target method \n')
+# MODEL RESULT: DATASET AFTER IMPUTATION USING MEAN BY TARGET
+print('\nRESULT when the dataset is imputed using Mean by target method \n')
 boundary()
 
 # Dividing independent and dependent (outcome) variables
-feature_names = replace_0_median.columns[0:8]
-x = replace_0_median[feature_names]
-y = replace_0_median['Outcome']
+feature_names = replace_0_mean.columns[0:8]
+x = replace_0_mean[feature_names]
+y = replace_0_mean['Outcome']
 print("Dependent Variables are:")
 print(list(feature_names))
 print("\nIndependent variable is:")
@@ -299,11 +299,11 @@ boundary()
 
 
 # Final Model output without RFE
-print('The final report of the model with data imputation using median by target and when the result of RFE is excluded.\n')
+print('The final report of the model with data imputation using mean by target and when the result of RFE is excluded.\n')
 
 # Independent and dependent variables
-x1 = replace_0_median[feature_names]  #independent variables
-y1 = replace_0_median['Outcome']      #dependent variable
+x1 = replace_0_mean[feature_names]  #independent variables
+y1 = replace_0_mean['Outcome']      #dependent variable
 
 # Splitting dataset into training set and test set
 x_train1, x_test1, y_train1, y_test1 = train_test_split(x1, y1, test_size=0.25, random_state = 1)
@@ -328,11 +328,11 @@ boundary()
 
 
 # Final Model output with RFE
-print('The final report of the model with data imputation using median by target and when the result of RFE is considered.\n')
+print('The final report of the model with data imputation using mean by target and when the result of RFE is considered.\n')
 
 # Independent and dependent variables
-x2 = replace_0_median[selected_features_rfe]  #independent variables
-y2 = replace_0_median['Outcome']              #dependent variable
+x2 = replace_0_mean[selected_features_rfe]  #independent variables
+y2 = replace_0_mean['Outcome']              #dependent variable
 
 # Splitting dataset into training set and test set
 x_train2, x_test2, y_train2, y_test2 = train_test_split(x2, y2, test_size=0.25, random_state = 1)
